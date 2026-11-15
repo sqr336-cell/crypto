@@ -33,6 +33,8 @@ Backend local, tests et mise en production : **[docs/04-mise-en-route.md](docs/0
 
 ## Documentation
 
+**[Dossier de production complet (PDF, 24 pages)](docs/BEATLINK-dossier-de-production.pdf)** : synthèse de tout ce qui suit.
+
 1. [Stratégie produit](docs/01-strategie-produit.md) : vision, concurrence, différenciation, MVP, stack et coûts, données, écrans, direction artistique
 2. [Architecture et décisions](docs/02-architecture-et-decisions.md)
 3. [Design system « Session de nuit »](docs/03-design-system.md)
