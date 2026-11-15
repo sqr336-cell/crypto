@@ -1,0 +1,20 @@
+{
+  "name": "beatlink",
+  "private": true,
+  "description": "BEATLINK monorepo: mobile app (Expo) + Supabase backend",
+  "scripts": {
+    "db:start": "supabase start",
+    "db:reset": "supabase db reset",
+    "test:db": "vitest run --root supabase/tests --config supabase/tests/vitest.config.mts",
+    "test:mobile": "npm --prefix mobile test",
+    "typecheck": "npm --prefix mobile run typecheck"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.119.0",
+    "@types/pg": "^8.23.1",
+    "pg": "^8.23.1",
+    "supabase": "^3.1.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}
