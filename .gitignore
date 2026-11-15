@@ -16,3 +16,4 @@ supabase/.branches/
 # misc
 .DS_Store
 *.log
+mobile/dist-supabase/

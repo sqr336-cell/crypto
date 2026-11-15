@@ -8,8 +8,8 @@
  * Secrets: PUSH_WEBHOOK_SECRET (required), EXPO_ACCESS_TOKEN (optional, only if
  * "enhanced push security" is enabled on the Expo project).
  */
-import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders, json, requireEnv } from '../_shared/http.ts';
+import { inList, remove, select } from '../_shared/supabase.ts';
 
 type Locale = 'en' | 'fr';
 
@@ -55,23 +55,19 @@ Deno.serve(async (req) => {
   const msg = payload.record as MessageRecord;
   if (msg.kind === 'system' && msg.meta?.event === 'project_completed') return json({ skipped: 'quiet_event' });
 
-  const admin = createClient(requireEnv('SUPABASE_URL'), requireEnv('SUPABASE_SERVICE_ROLE_KEY'), {
-    auth: { persistSession: false },
-  });
+  const members = await select<{ profile_id: string; muted: boolean; profiles: { display_name?: string } | null }>(
+    `conversation_members?conversation_id=eq.${msg.conversation_id}&select=profile_id,muted,profiles(display_name)`,
+  );
+  if (!members.length) return json({ skipped: 'no_members' });
 
-  const { data: members } = await admin
-    .from('conversation_members')
-    .select('profile_id, muted, profiles(display_name)')
-    .eq('conversation_id', msg.conversation_id);
-  if (!members?.length) return json({ skipped: 'no_members' });
-
-  const nameOf = (id: string | null) =>
-    (members.find((m) => m.profile_id === id)?.profiles as { display_name?: string } | null)?.display_name ?? 'BEATLINK';
+  const nameOf = (id: string | null) => members.find((m) => m.profile_id === id)?.profiles?.display_name ?? 'BEATLINK';
   const recipients = members.filter((m) => m.profile_id !== msg.sender_id && !m.muted).map((m) => m.profile_id);
   if (!recipients.length) return json({ skipped: 'no_recipients' });
 
-  const { data: tokens } = await admin.from('push_tokens').select('token, profile_id, locale').in('profile_id', recipients);
-  if (!tokens?.length) return json({ sent: 0 });
+  const tokens = await select<{ token: string; profile_id: string; locale: string }>(
+    `push_tokens?profile_id=in.${inList(recipients)}&select=token,profile_id,locale`,
+  );
+  if (!tokens.length) return json({ sent: 0 });
 
   const notifications = tokens.map((t) => {
     const c = COPY[(t.locale as Locale) ?? 'en'] ?? COPY.en;
@@ -110,7 +106,7 @@ Deno.serve(async (req) => {
     const stale = tickets
       .map((ticket, j) => (ticket.details?.error === 'DeviceNotRegistered' ? batch[j].to : null))
       .filter((x): x is string => !!x);
-    if (stale.length) await admin.from('push_tokens').delete().in('token', stale);
+    if (stale.length) await remove(`push_tokens?token=in.${inList(stale)}`);
     sent += tickets.filter((ticket) => ticket.status === 'ok').length;
   }
   return json({ sent });

@@ -5,9 +5,10 @@
   "scripts": {
     "db:start": "supabase start",
     "db:reset": "supabase db reset",
-    "test:db": "vitest run --root supabase/tests --config supabase/tests/vitest.config.mts",
+    "test:db": "vitest run --root supabase/tests --config vitest.config.mts",
     "test:mobile": "npm --prefix mobile test",
-    "typecheck": "npm --prefix mobile run typecheck"
+    "typecheck": "npm --prefix mobile run typecheck",
+    "db:seed": "node scripts/seed-local.mjs"
   },
   "devDependencies": {
     "@supabase/supabase-js": "^2.119.0",

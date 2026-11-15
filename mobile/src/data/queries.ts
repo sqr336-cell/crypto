@@ -210,7 +210,8 @@ export function useBlock() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (userId: string) => backend.block(userId),
-    onSuccess: () => {
+    onSuccess: (_r, userId) => {
+      qc.removeQueries({ queryKey: keys.profile(userId) });
       invalidateNetwork(qc);
       void qc.invalidateQueries({ queryKey: keys.feedAll });
       void qc.invalidateQueries({ queryKey: keys.blocked });

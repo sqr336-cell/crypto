@@ -3,6 +3,8 @@
 --   * SECURITY DEFINER functions pin `search_path = ''` and qualify every name.
 --   * Errors raised for the client use stable machine codes in MESSAGE
 --     (e.g. 'daily_interest_limit'); the app maps them to translated copy.
+--   * SQLSTATE 'PTxxx' makes PostgREST answer with HTTP status xxx
+--     (PT401 not signed in, PT404 not found, PT429 daily limit reached).
 
 -- ---------------------------------------------------------------------------
 -- Small helpers
@@ -83,7 +85,7 @@ create or replace function public.assert_ready(uid uuid)
 returns void language plpgsql stable security definer set search_path = '' as $$
 begin
   if uid is null then
-    raise exception 'not_authenticated' using errcode = '28000';
+    raise exception 'not_authenticated' using errcode = 'PT401';
   end if;
   if not exists (select 1 from public.profiles where id = uid and onboarded_at is not null) then
     raise exception 'profile_incomplete' using errcode = 'P0001';
@@ -390,14 +392,14 @@ begin
     select interests into used from public.daily_usage where profile_id = uid and day = current_date for update;
     cap := lim.daily_interests;
     if cap is not null and used >= cap then
-      raise exception 'daily_interest_limit' using errcode = 'P0001', hint = cap::text;
+      raise exception 'daily_interest_limit' using errcode = 'PT429', hint = cap::text;
     end if;
     update public.daily_usage set interests = interests + 1 where profile_id = uid and day = current_date;
   else
     select requests into used from public.daily_usage where profile_id = uid and day = current_date for update;
     cap := lim.daily_requests;
     if used >= cap then
-      raise exception 'daily_request_limit' using errcode = 'P0001', hint = cap::text;
+      raise exception 'daily_request_limit' using errcode = 'PT429', hint = cap::text;
     end if;
     update public.daily_usage set requests = requests + 1 where profile_id = uid and day = current_date;
   end if;
@@ -507,12 +509,12 @@ declare
   them public.profiles;
   conn public.connections;
 begin
-  if auth.uid() is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  if auth.uid() is null then raise exception 'not_authenticated' using errcode = 'PT401'; end if;
   select * into me from public.profiles where id = auth.uid();
   select * into them from public.profiles where id = p_id;
   if them.id is null
      or (them.id <> auth.uid() and (them.onboarded_at is null or public.is_blocked_pair(auth.uid(), them.id))) then
-    raise exception 'profile_not_found' using errcode = 'P0002';
+    raise exception 'profile_not_found' using errcode = 'PT404';
   end if;
 
   select * into conn from public.connections x
@@ -549,7 +551,7 @@ begin
   if p_target = me then raise exception 'invalid_target' using errcode = '22023'; end if;
   if not exists (select 1 from public.profiles where id = p_target and onboarded_at is not null)
      or public.is_blocked_pair(me, p_target) then
-    raise exception 'target_unavailable' using errcode = 'P0002';
+    raise exception 'target_unavailable' using errcode = 'PT404';
   end if;
 
   select decision into prev from public.swipes where actor_id = me and target_id = p_target;
@@ -596,7 +598,7 @@ begin
   if p_target = me then raise exception 'invalid_target' using errcode = '22023'; end if;
   if not exists (select 1 from public.profiles where id = p_target and onboarded_at is not null)
      or public.is_blocked_pair(me, p_target) then
-    raise exception 'target_unavailable' using errcode = 'P0002';
+    raise exception 'target_unavailable' using errcode = 'PT404';
   end if;
   if exists (select 1 from public.collab_requests
              where sender_id = me and recipient_id = p_target and status = 'pending') then
@@ -645,13 +647,13 @@ begin
   perform public.assert_ready(me);
   select * into r from public.collab_requests where id = p_request for update;
   if r.id is null or r.recipient_id <> me then
-    raise exception 'request_not_found' using errcode = 'P0002';
+    raise exception 'request_not_found' using errcode = 'PT404';
   end if;
   if r.status <> 'pending' then
     raise exception 'request_not_pending' using errcode = 'P0001';
   end if;
   if public.is_blocked_pair(r.sender_id, r.recipient_id) then
-    raise exception 'target_unavailable' using errcode = 'P0002';
+    raise exception 'target_unavailable' using errcode = 'PT404';
   end if;
 
   if not p_accept then
@@ -703,7 +705,7 @@ returns void language plpgsql security definer set search_path = '' as $$
 begin
   update public.collab_requests set status = 'withdrawn', responded_at = now()
     where id = p_request and sender_id = auth.uid() and status = 'pending';
-  if not found then raise exception 'request_not_found' using errcode = 'P0002'; end if;
+  if not found then raise exception 'request_not_found' using errcode = 'PT404'; end if;
 end $$;
 
 create or replace function public.start_collaboration(p_conversation uuid, p_title text)
@@ -734,7 +736,7 @@ declare
   c public.collaborations;
 begin
   if not public.is_collaboration_member(p_collaboration) then
-    raise exception 'collaboration_not_found' using errcode = 'P0002';
+    raise exception 'collaboration_not_found' using errcode = 'PT404';
   end if;
   update public.collaborations set status = p_status where id = p_collaboration returning * into c;
   if p_status = 'completed' and c.conversation_id is not null then
@@ -748,7 +750,7 @@ returns void language plpgsql security definer set search_path = '' as $$
 begin
   delete from public.connections
     where id = p_connection and auth.uid() in (user_a, user_b);
-  if not found then raise exception 'connection_not_found' using errcode = 'P0002'; end if;
+  if not found then raise exception 'connection_not_found' using errcode = 'PT404'; end if;
 end $$;
 
 -- ---------------------------------------------------------------------------
@@ -860,7 +862,7 @@ returns void language plpgsql security definer set search_path = '' as $$
 declare
   me uuid := auth.uid();
 begin
-  if me is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  if me is null then raise exception 'not_authenticated' using errcode = 'PT401'; end if;
   if p_target = me then raise exception 'invalid_target' using errcode = '22023'; end if;
   insert into public.blocks (blocker_id, blocked_id) values (me, p_target) on conflict do nothing;
   delete from public.connections where user_a = least(me, p_target) and user_b = greatest(me, p_target);
@@ -900,15 +902,15 @@ declare
   target uuid := p_target_profile;
   report_id uuid;
 begin
-  if me is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  if me is null then raise exception 'not_authenticated' using errcode = 'PT401'; end if;
   if (select count(*) from public.reports where reporter_id = me and created_at > now() - interval '1 day') >= 20 then
-    raise exception 'report_limit' using errcode = 'P0001';
+    raise exception 'report_limit' using errcode = 'PT429';
   end if;
 
   if p_message is not null then
     select * into m from public.messages where id = p_message;
     if m.id is null or not public.is_conversation_member(m.conversation_id) then
-      raise exception 'message_not_found' using errcode = 'P0002';
+      raise exception 'message_not_found' using errcode = 'PT404';
     end if;
     target := coalesce(target, m.sender_id);
     ev := ev || jsonb_build_object('message', jsonb_build_object(
@@ -918,7 +920,7 @@ begin
 
   if p_track is not null then
     select * into t from public.tracks where id = p_track;
-    if t.id is null then raise exception 'track_not_found' using errcode = 'P0002'; end if;
+    if t.id is null then raise exception 'track_not_found' using errcode = 'PT404'; end if;
     target := coalesce(target, t.owner_id);
     ev := ev || jsonb_build_object('track', jsonb_build_object(
       'title', t.title, 'storage_path', t.storage_path, 'owner_id', t.owner_id));

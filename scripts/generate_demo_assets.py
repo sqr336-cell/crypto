@@ -6,6 +6,7 @@ demo profiles. Output:
 
   mobile/assets/demo/audio/<id>.m4a
   mobile/assets/demo/images/<profile>-cover.jpg / -avatar.jpg
+  mobile/assets/demo/audio/manifest.json     (metadata for scripts/seed-local.mjs)
   mobile/src/data/demo/assets.generated.ts   (requires + waveform peaks + durations)
 
 Usage: python3 scripts/generate_demo_assets.py   (needs numpy, Pillow, ffmpeg)
@@ -570,6 +571,9 @@ def main():
             f"  {name}: {{ cover: require('../../../assets/demo/images/{name}-cover.jpg'), avatar: require('../../../assets/demo/images/{name}-avatar.jpg') }},"
         )
     lines += ["} as const;", ""]
+    manifest = {tid: dict(title=m["title"], bpm=m["bpm"], musicalKey=m["key"], genre=m["genre"], durationMs=m["durationMs"], waveform=m["waveform"]) for tid, m in meta.items()}
+    with open(os.path.join(AUDIO_DIR, "manifest.json"), "w") as f:
+        json.dump(manifest, f, ensure_ascii=False)
     os.makedirs(os.path.dirname(TS_OUT), exist_ok=True)
     with open(TS_OUT, "w") as f:
         f.write("\n".join(lines))
