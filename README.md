@@ -38,7 +38,8 @@ Backend local, tests et mise en production : **[docs/04-mise-en-route.md](docs/0
 3. [Design system « Session de nuit »](docs/03-design-system.md)
 4. [Mise en route, configuration, ce qui manque](docs/04-mise-en-route.md)
 5. [Préparation au lancement](docs/05-lancement.md)
-6. Brouillons légaux : [confidentialité](legal/politique-de-confidentialite.md), [conditions d'utilisation](legal/conditions-utilisation.md) (**à faire valider par un juriste**)
+6. [Plan d'action communication sur 12 semaines](docs/06-plan-communication.md) (commence par vérifier le nom : une app « BeatLink » existe déjà)
+7. Brouillons légaux : [confidentialité](legal/politique-de-confidentialite.md), [conditions d'utilisation](legal/conditions-utilisation.md) (**à faire valider par un juriste**)
 
 ## Structure
 
