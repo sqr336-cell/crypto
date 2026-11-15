@@ -73,13 +73,12 @@ export default function ProfileScreen() {
       destructive: true,
     });
     if (!ok) return;
-    block.mutate(p.id, {
-      onSuccess: () => {
-        toast(t('profile.blocked', { name: p.displayName }));
-        goBack();
-      },
-      onError: toastError,
-    });
+    // Leave the screen first: once blocked, this profile is no longer readable.
+    goBack();
+    block
+      .mutateAsync(p.id)
+      .then(() => toast(t('profile.blocked', { name: p.displayName })))
+      .catch(toastError);
   };
 
   let actions;

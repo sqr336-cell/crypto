@@ -114,7 +114,7 @@ export default function Welcome() {
                 onPress={() => router.push('/sign-in')}
                 testID="welcome-email"
               />
-              <Text variant="caption" tone="dim" align="center">
+              <Text variant="caption" tone="mist" align="center">
                 {t('welcome.legal')}
               </Text>
             </>

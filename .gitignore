@@ -17,3 +17,9 @@ supabase/.branches/
 .DS_Store
 *.log
 mobile/dist-supabase/
+
+# e2e screenshots
+mobile/e2e/screenshots/
+
+# generated web demo inside the landing site
+landing/app/

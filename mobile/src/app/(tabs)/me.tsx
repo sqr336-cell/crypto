@@ -45,7 +45,7 @@ export default function Me() {
             </View>
           }
           soundsAction={
-            <Text variant="caption" tone="dim" tabular>
+            <Text variant="caption" tone="mist" tabular>
               {t('profile.soundsCount', { used: count, limit })}
             </Text>
           }

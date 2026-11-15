@@ -61,7 +61,7 @@ function TabBar({ state, navigateToTab }: BottomTabBarProps) {
               testID={`tab-${route.name}`}
             >
               <View>
-                <Icon size={22} color={focused ? colors.paper : colors.dim} strokeWidth={focused ? 2.1 : 1.8} />
+                <Icon size={22} color={focused ? colors.paper : colors.mist} strokeWidth={focused ? 2.1 : 1.8} />
                 {badge > 0 ? (
                   <View style={styles.badge}>
                     <Text variant="micro" tone="ink" tabular>
@@ -70,7 +70,7 @@ function TabBar({ state, navigateToTab }: BottomTabBarProps) {
                   </View>
                 ) : null}
               </View>
-              <Text variant="micro" tone={focused ? 'paper' : 'dim'}>
+              <Text variant="micro" tone={focused ? 'paper' : 'mist'}>
                 {t(tab.label)}
               </Text>
               <View style={[styles.indicator, focused && styles.indicatorOn]} />

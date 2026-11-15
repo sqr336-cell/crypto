@@ -162,7 +162,7 @@ export default function Discover() {
         </View>
       ) : null}
       {current && linksLeft != null && linksLeft <= 10 ? (
-        <Text variant="caption" tone="dim" align="center" style={styles.left}>
+        <Text variant="caption" tone="mist" align="center" style={styles.left}>
           {t('discover.linksLeft', { n: Math.max(0, linksLeft) })}
         </Text>
       ) : null}

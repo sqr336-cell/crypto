@@ -16,6 +16,7 @@ import { Tag } from '../ui/Chip';
 import { SectionTitle } from '../ui/Layout';
 import { PressableScale } from '../ui/PressableScale';
 import { Text } from '../ui/Text';
+import { CoverFallback } from './CoverFallback';
 import { FitReasons, FitTier } from './Fit';
 
 interface Props {
@@ -46,7 +47,7 @@ export function ProfileBody({ profile, tracks, links, fit, mine, onDeleteTrack, 
         {profile.banner ? (
           <Image source={profile.banner} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
         ) : (
-          <BannerFallback seed={profile.id} />
+          <CoverFallback seed={profile.id} />
         )}
         <LinearGradient colors={['rgba(14,13,18,0.1)', 'rgba(14,13,18,1)']} locations={[0.35, 1]} style={StyleSheet.absoluteFill} />
       </View>
@@ -117,7 +118,7 @@ export function ProfileBody({ profile, tracks, links, fit, mine, onDeleteTrack, 
             />
           ))}
           {!tracks.length && !soundsFooter ? (
-            <Text variant="body" tone="dim">
+            <Text variant="body" tone="mist">
               {t('discover.noSounds')}
             </Text>
           ) : null}
@@ -126,7 +127,7 @@ export function ProfileBody({ profile, tracks, links, fit, mine, onDeleteTrack, 
       </Section>
 
       <Section title={t('profile.about')}>
-        <Text variant="body" tone={profile.bio ? 'paper' : 'dim'}>
+        <Text variant="body" tone={profile.bio ? 'paper' : 'mist'}>
           {profile.bio ?? t('profile.noBio')}
         </Text>
       </Section>
@@ -207,20 +208,6 @@ export function ProfileBody({ profile, tracks, links, fit, mine, onDeleteTrack, 
   );
 }
 
-/** Without a cover image, a quiet level-meter texture keeps the header intentional. */
-function BannerFallback({ seed }: { seed: string }) {
-  let h = 7;
-  for (const c of seed) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-  const bars = Array.from({ length: 48 }, (_, i) => 0.2 + 0.8 * Math.abs(Math.sin((h % 97) * 0.13 + i * 0.47) * Math.cos(i * 0.21 + (h % 13))));
-  return (
-    <View style={styles.fallback}>
-      {bars.map((v, i) => (
-        <View key={i} style={[styles.fallbackBar, { height: `${Math.round(v * 70)}%` }]} />
-      ))}
-    </View>
-  );
-}
-
 function Section({ title, action, children }: { title: string; action?: ReactNode; children: ReactNode }) {
   return (
     <View style={styles.section}>
@@ -245,8 +232,6 @@ function Detail({ label, value }: { label: string; value: string }) {
 
 const styles = StyleSheet.create({
   banner: { height: 200, backgroundColor: colors.desk },
-  fallback: { ...StyleSheet.absoluteFill, flexDirection: 'row', alignItems: 'flex-end', gap: 4, paddingHorizontal: space.sm, opacity: 0.55 },
-  fallbackBar: { flex: 1, borderTopLeftRadius: 2, borderTopRightRadius: 2, backgroundColor: colors.fader },
   identity: { paddingHorizontal: space.xl, marginTop: -60, gap: space.sm },
   nameBlock: { gap: 2, marginTop: space.sm },
   demoBadge: { alignSelf: 'flex-start', paddingHorizontal: space.sm, paddingVertical: 3, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.hairlineStrong, marginBottom: space.xs },

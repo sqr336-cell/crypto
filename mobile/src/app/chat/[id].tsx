@@ -133,14 +133,12 @@ export default function Chat() {
       cancelLabel: t('common.cancel'),
       destructive: true,
     });
-    if (ok)
-      block.mutate(other.id, {
-        onSuccess: () => {
-          toast(t('profile.blocked', { name: other.displayName }));
-          goBack('/messages');
-        },
-        onError: toastError,
-      });
+    if (!ok) return;
+    goBack('/messages');
+    block
+      .mutateAsync(other.id)
+      .then(() => toast(t('profile.blocked', { name: other.displayName })))
+      .catch(toastError);
   };
 
   const nameOf = (m: Message) => (m.senderId === myId ? me.data?.displayName ?? '' : other?.displayName ?? '');

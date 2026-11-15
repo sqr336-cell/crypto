@@ -49,7 +49,7 @@ export function FitReasons({ fit, city, max = 3 }: { fit: Fit; city: string | nu
   const reasons = fitReasons(fit, max);
   if (!reasons.length) {
     return (
-      <Text variant="caption" tone="dim">
+      <Text variant="caption" tone="mist">
         {t('fit.nothingShared')}
       </Text>
     );

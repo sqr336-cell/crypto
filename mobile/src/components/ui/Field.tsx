@@ -27,7 +27,7 @@ export const Field = forwardRef<TextInputInstance, FieldProps>(function Field(
             {label}
           </Text>
           {optionalLabel ? (
-            <Text variant="caption" tone="dim">
+            <Text variant="caption" tone="mist">
               {optionalLabel}
             </Text>
           ) : null}
@@ -69,7 +69,7 @@ export const Field = forwardRef<TextInputInstance, FieldProps>(function Field(
       </View>
       {error || hint || max ? (
         <View style={styles.footer}>
-          <Text variant="caption" tone={error ? 'clip' : 'dim'} style={styles.footerText}>
+          <Text variant="caption" tone={error ? 'clip' : 'mist'} style={styles.footerText}>
             {error ?? hint ?? ''}
           </Text>
           {max && focused ? (

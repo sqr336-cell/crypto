@@ -33,10 +33,14 @@ export default function Report() {
     setError(null);
     try {
       await report.mutateAsync({ reason, targetProfileId: profileId || undefined, messageId: messageId || undefined, trackId: trackId || undefined, details: details.trim() || undefined });
-      if (alsoBlock && profileId) await block.mutateAsync(profileId);
       toast(t('report.sent'));
-      if (alsoBlock) router.dismissAll();
-      else goBack();
+      if (alsoBlock && profileId) {
+        // Leave the reported profile or conversation before blocking: it becomes unreadable.
+        router.dismissAll();
+        await block.mutateAsync(profileId);
+      } else {
+        goBack();
+      }
     } catch (e) {
       setError(errorMessage(e));
     }

@@ -149,7 +149,7 @@ export default function Onboarding() {
             <View key={s} style={[styles.segment, i <= index && styles.segmentOn]} />
           ))}
         </View>
-        <Text variant="caption" tone="dim" tabular>
+        <Text variant="caption" tone="mist" tabular>
           {t('onboarding.progress', { n: index + 1, total: STEPS.length })}
         </Text>
       </View>

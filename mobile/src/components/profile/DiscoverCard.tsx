@@ -25,6 +25,7 @@ import { Waveform } from '../audio/Waveform';
 import { AvailabilityMeter } from '../ui/AvailabilityMeter';
 import { PressableScale } from '../ui/PressableScale';
 import { Text } from '../ui/Text';
+import { CoverFallback } from './CoverFallback';
 import { FitReasons, FitTier } from './Fit';
 
 export interface DiscoverCardHandle {
@@ -107,7 +108,11 @@ export const DiscoverCard = forwardRef<DiscoverCardHandle, Props>(function Disco
     <Animated.View style={[styles.card, cardStyle]} testID="discover-card">
       <GestureDetector gesture={pan}>
         <View style={styles.cover}>
-          {profile.banner ? <Image source={profile.banner} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} /> : null}
+          {profile.banner ?? profile.avatar ? (
+            <Image source={(profile.banner ?? profile.avatar)!} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+          ) : (
+            <CoverFallback seed={profile.id} />
+          )}
           <LinearGradient
             colors={['rgba(14,13,18,0)', 'rgba(14,13,18,0.35)', 'rgba(14,13,18,0.94)']}
             locations={[0.25, 0.55, 1]}
@@ -225,7 +230,7 @@ export const DiscoverCard = forwardRef<DiscoverCardHandle, Props>(function Disco
             />
           </>
         ) : (
-          <Text variant="caption" tone="dim">
+          <Text variant="caption" tone="mist">
             {t('discover.noSounds')}
           </Text>
         )}

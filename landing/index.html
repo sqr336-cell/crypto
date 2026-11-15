@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BEATLINK</title>
+  <meta name="description" content="Le réseau où les créateurs de musique se trouvent par le son. Écoute d'abord, linke avec des producteurs, artistes et musiciens dont le son colle au tien." />
+  <meta name="theme-color" content="#0E0D12" />
+  <link rel="icon" href="assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --booth: #0e0d12; --desk: #16151b; --rack: #1f1d26; --fader: #2e2b38; --fader-hi: #423d50;
+      --paper: #eeebf5; --mist: #9c98ab; --dim: #6d6979; --signal: #a99bff; --signal-ink: #15112a;
+      --hair: rgba(238, 235, 245, 0.1);
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: var(--booth); color: var(--paper); font: 400 17px/1.55 'Instrument Sans', system-ui, sans-serif; }
+    a { color: inherit; }
+    .wrap { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+    header .wrap { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+    .wordmark { font: 800 24px/1 Syne, sans-serif; letter-spacing: -0.02em; text-decoration: none; position: relative; }
+    .wordmark .i { position: relative; }
+    .wordmark .i::after { content: ''; position: absolute; left: 50%; top: -0.04em; width: 0.24em; height: 0.24em; margin-left: -0.12em; border-radius: 50%; background: var(--signal); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 50px; padding: 0 24px; border-radius: 999px; font-weight: 600; text-decoration: none; border: 1px solid transparent; transition: transform .15s ease, background .15s ease; }
+    .btn:active { transform: scale(.97); }
+    .btn-primary { background: var(--signal); color: var(--signal-ink); }
+    .btn-ghost { border-color: var(--hair); color: var(--paper); }
+    .btn:focus-visible, button:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
+
+    .hero { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: center; padding-top: 48px; padding-bottom: 96px; }
+    h1 { font: 800 clamp(44px, 7vw, 84px)/0.98 Syne, sans-serif; letter-spacing: -0.035em; margin: 0 0 24px; }
+    .lede { color: var(--mist); max-width: 30em; margin: 0 0 32px; font-size: 19px; }
+    .ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+    .note { color: var(--mist); font-size: 14px; margin-top: 16px; }
+
+    .card { background: var(--desk); border: 1px solid var(--hair); border-radius: 28px; overflow: hidden; max-width: 420px; justify-self: end; width: 100%; }
+    .cover { position: relative; aspect-ratio: 4 / 3.4; background: var(--rack) url(assets/cover.jpg) center / cover; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; }
+    .cover::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(14,13,18,0) 35%, rgba(14,13,18,.94)); }
+    .cover > * { position: relative; }
+    .badge { position: absolute; top: 16px; left: 16px; font-size: 12px; padding: 4px 10px; border-radius: 999px; background: rgba(14,13,18,.6); border: 1px solid var(--hair); }
+    .name { font: 800 34px/1.05 Syne, sans-serif; letter-spacing: -0.03em; margin: 0 0 6px; }
+    .meta { font-size: 14px; color: var(--paper); }
+    .meter { display: inline-flex; align-items: flex-end; gap: 2px; height: 10px; margin-right: 8px; vertical-align: -1px; }
+    .meter i { width: 2.5px; border-radius: 1px; background: var(--signal); }
+    .player { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 16px 20px 8px; }
+    .play { width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--paper); color: var(--booth); cursor: pointer; display: grid; place-items: center; }
+    .play[aria-pressed="true"] { background: var(--signal); color: var(--signal-ink); }
+    .track { font-weight: 600; font-size: 15px; }
+    .track small { display: block; color: var(--mist); font-weight: 400; font-size: 13px; }
+    .time { font-size: 13px; color: var(--mist); font-variant-numeric: tabular-nums; }
+    .wave { display: flex; align-items: center; gap: 2px; height: 40px; padding: 0 20px 16px; cursor: pointer; }
+    .wave span { flex: 1; border-radius: 2px; background: var(--fader); min-height: 2px; }
+    .wave span.on { background: var(--paper); }
+    .fit { margin: 0 12px 12px; padding: 14px 16px; border-radius: 20px; background: var(--booth); font-size: 14px; }
+    .fit strong { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .dots { display: inline-flex; gap: 3px; } .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--signal); }
+    .fit p { margin: 4px 0; padding-left: 10px; border-left: 2px solid rgba(169,155,255,.4); }
+
+    section { padding: 88px 0; border-top: 1px solid var(--hair); }
+    h2 { font: 800 clamp(30px, 4vw, 46px)/1.05 Syne, sans-serif; letter-spacing: -0.03em; margin: 0 0 20px; max-width: 16em; }
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+    .copy { color: var(--mist); max-width: 32em; }
+    .copy p { margin: 0 0 16px; }
+    .criteria { display: grid; gap: 16px; }
+    .crit { display: grid; gap: 6px; font-size: 15px; }
+    .crit div { display: flex; justify-content: space-between; }
+    .crit span:last-child { color: var(--mist); font-variant-numeric: tabular-nums; }
+    .bar { height: 4px; border-radius: 2px; background: var(--fader); overflow: hidden; } .bar i { display: block; height: 100%; background: var(--signal); }
+    .gestures { display: grid; gap: 0; }
+    .gesture { display: grid; grid-template-columns: 140px 1fr; gap: 24px; padding: 24px 0; border-top: 1px solid var(--hair); }
+    .gesture:first-child { border-top: 0; padding-top: 0; }
+    .gesture b { font: 700 20px/1.2 Syne, sans-serif; }
+    .gesture p { margin: 0; color: var(--mist); }
+    .safety { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 56px; }
+    .safety h3 { font: 600 17px/1.3 'Instrument Sans', sans-serif; margin: 0 0 6px; }
+    .safety p { margin: 0; color: var(--mist); }
+    .final { text-align: left; }
+    footer { border-top: 1px solid var(--hair); padding: 32px 0 48px; color: var(--mist); font-size: 14px; }
+    footer .wrap { display: flex; flex-wrap: wrap; gap: 16px 32px; justify-content: space-between; }
+    footer nav { display: flex; gap: 20px; }
+    @media (max-width: 860px) {
+      .hero, .split { grid-template-columns: 1fr; gap: 40px; }
+      .card { justify-self: start; }
+      .hero { padding-top: 24px; }
+      .gesture { grid-template-columns: 1fr; gap: 8px; }
+      .safety { grid-template-columns: 1fr; }
+      section { padding: 64px 0; }
+    }
+    @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <a class="wordmark" href="#" aria-label="BEATLINK">beatl<span class="i">ı</span>nk</a>
+      <a class="btn btn-ghost" href="app/">Essayer la démo</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap hero">
+      <div>
+        <h1>Trouve ton son. Trouve tes gens.</h1>
+        <p class="lede">BEATLINK met en relation beatmakers, producteurs, chanteurs, rappeurs et musiciens par ce qui compte vraiment : leur son. Écoute d'abord, linke ensuite, et transforme la rencontre en morceau.</p>
+        <div class="ctas">
+          <a class="btn btn-primary" href="app/">Essayer la démo</a>
+          <a class="btn btn-ghost" href="mailto:[contact@domaine]?subject=B%C3%AAta%20BEATLINK">Rejoindre la bêta</a>
+        </div>
+        <p class="note">Gratuit. Bêta en préparation sur iOS et Android.</p>
+      </div>
+
+      <article class="card" aria-label="Exemple de profil de découverte">
+        <div class="cover">
+          <span class="badge">Profil démo</span>
+          <p class="name">Nayla Vélour</p>
+          <p class="meta"><span class="meter" aria-hidden="true"><i style="height:5px"></i><i style="height:7.5px"></i><i style="height:10px"></i></span>Productrice, beatmaker <span style="color:var(--mist)">&nbsp; Paris</span></p>
+        </div>
+        <div class="player">
+          <button class="play" id="play" aria-pressed="false" aria-label="Lire Velours">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path id="icon" d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>
+          </button>
+          <div class="track">Velours <small>92 BPM &nbsp; Ré mineur</small></div>
+          <span class="time" id="time">0:20</span>
+        </div>
+        <div class="wave" id="wave" role="slider" aria-label="Position dans Velours" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0"></div>
+        <div class="fit">
+          <strong><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span> Très compatible</strong>
+          <p>Chacun apporte ce que l'autre cherche</p>
+          <p>2 genres en commun : R&amp;B alternatif et Soul</p>
+        </div>
+        <audio id="audio" src="assets/velours.mp3" preload="none"></audio>
+      </article>
+    </div>
+
+    <section>
+      <div class="wrap split">
+        <div>
+          <h2>Pourquoi vous, en toutes lettres</h2>
+          <div class="copy">
+            <p>Pas de pourcentage magique. BEATLINK additionne des critères visibles : genres et influences en commun, rôles complémentaires (une prod qui cherche une topline), disponibilité, objectifs, langue.</p>
+            <p>Chaque carte te dit pourquoi elle est là. Le détail des points est toujours consultable.</p>
+          </div>
+        </div>
+        <div class="criteria" aria-label="Exemple de détail de compatibilité">
+          <div class="crit"><div><span>Genres en commun</span><span>20 / 30</span></div><div class="bar"><i style="width:67%"></i></div></div>
+          <div class="crit"><div><span>Rôles complémentaires</span><span>20 / 20</span></div><div class="bar"><i style="width:100%"></i></div></div>
+          <div class="crit"><div><span>Influences communes</span><span>8 / 15</span></div><div class="bar"><i style="width:53%"></i></div></div>
+          <div class="crit"><div><span>Compétences complémentaires</span><span>10 / 10</span></div><div class="bar"><i style="width:100%"></i></div></div>
+          <div class="crit"><div><span>Disponibilité</span><span>10 / 10</span></div><div class="bar"><i style="width:100%"></i></div></div>
+          <div class="crit"><div><span>Objectifs</span><span>10 / 10</span></div><div class="bar"><i style="width:100%"></i></div></div>
+          <div class="crit"><div><span>Langue et logistique</span><span>5 / 5</span></div><div class="bar"><i style="width:100%"></i></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap split">
+        <h2>Du premier son au premier morceau</h2>
+        <div class="gestures">
+          <div class="gesture"><b>Écoute</b><p>Les extraits se lancent depuis la carte et l'écoute continue d'un profil à l'autre. On décide à l'oreille, pas sur une photo.</p></div>
+          <div class="gesture"><b>Linke</b><p>Ton intérêt reste privé. Quand il est réciproque, c'est un link, et la conversation s'ouvre.</p></div>
+          <div class="gesture"><b>Propose</b><p>Un message, un titre de projet, un de tes sons. Une fois acceptée, la proposition devient un projet en cours.</p></div>
+          <div class="gesture"><b>Échange</b><p>Envoie tes idées en audio : elles s'écoutent directement dans la conversation, avec leur waveform.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <h2>Entre pairs, en confiance</h2>
+        <div class="safety">
+          <div><h3>Pas de messages non sollicités</h3><p>On ne peut écrire qu'après un link réciproque ou une proposition acceptée.</p></div>
+          <div><h3>Bloquer et signaler, partout</h3><p>Sur chaque profil et chaque message. Un blocage coupe le link et la conversation.</p></div>
+          <div><h3>Tes données t'appartiennent</h3><p>Export de tes données et suppression complète du compte, directement depuis l'app.</p></div>
+          <div><h3>Gratuit pour se connecter</h3><p>La mise en relation ne sera jamais payante. Les limites quotidiennes servent seulement à éviter le spam.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final">
+      <div class="wrap">
+        <h2>Ton prochain morceau commence par une écoute.</h2>
+        <div class="ctas"><a class="btn btn-primary" href="app/">Essayer la démo</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>© BEATLINK</span>
+      <nav aria-label="Informations légales"><a href="privacy.html">Confidentialité</a><a href="terms.html">Conditions</a><a href="mailto:[contact@domaine]">Contact</a></nav>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var peaks = [87, 80, 63, 50, 29, 69, 56, 50, 81, 85, 69, 54, 68, 45, 38, 16, 69, 91, 75, 57, 44, 38, 67, 66, 34, 90, 81, 64, 52, 69, 43, 30, 18, 76, 87, 70, 54, 37, 60, 49, 66, 52, 94, 76, 58, 55, 62, 42, 28, 15, 100, 81, 65, 50, 30, 69, 53, 57, 72, 86, 66, 38, 28, 9];
+      var wave = document.getElementById('wave'), audio = document.getElementById('audio');
+      var play = document.getElementById('play'), icon = document.getElementById('icon'), time = document.getElementById('time');
+      var bars = peaks.map(function (p) { var s = document.createElement('span'); s.style.height = Math.max(6, p) + '%'; wave.appendChild(s); return s; });
+      function fmt(t) { t = Math.max(0, Math.round(t)); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); }
+      function render() {
+        var d = audio.duration || 20, f = audio.currentTime / d;
+        bars.forEach(function (b, i) { b.classList.toggle('on', (i + 0.5) / bars.length <= f); });
+        time.textContent = audio.paused && audio.currentTime === 0 ? fmt(d) : fmt(audio.currentTime);
+        wave.setAttribute('aria-valuenow', String(Math.round(f * 100)));
+      }
+      function setPlaying(on) { play.setAttribute('aria-pressed', on ? 'true' : 'false'); play.setAttribute('aria-label', on ? 'Mettre Velours en pause' : 'Lire Velours'); icon.setAttribute('d', on ? 'M4 2.5h3v11H4zM9 2.5h3v11H9z' : 'M4 2.5v11l9-5.5z'); }
+      play.addEventListener('click', function () { if (audio.paused) audio.play(); else audio.pause(); });
+      audio.addEventListener('play', function () { setPlaying(true); });
+      audio.addEventListener('pause', function () { setPlaying(false); });
+      audio.addEventListener('ended', function () { audio.currentTime = 0; render(); });
+      audio.addEventListener('timeupdate', render);
+      wave.addEventListener('click', function (e) { var r = wave.getBoundingClientRect(); audio.currentTime = ((e.clientX - r.left) / r.width) * (audio.duration || 20); if (audio.paused) audio.play(); });
+      wave.addEventListener('keydown', function (e) { var d = audio.duration || 20; if (e.key === 'ArrowRight') audio.currentTime = Math.min(d, audio.currentTime + 2); if (e.key === 'ArrowLeft') audio.currentTime = Math.max(0, audio.currentTime - 2); render(); });
+      render();
+    })();
+  </script>
+</body>
+</html>

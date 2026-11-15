@@ -211,8 +211,8 @@ export function useBlock() {
   return useMutation({
     mutationFn: (userId: string) => backend.block(userId),
     onSuccess: (_r, userId) => {
-      qc.removeQueries({ queryKey: keys.profile(userId) });
-      invalidateNetwork(qc);
+      invalidateNetwork(qc, userId);
+      qc.removeQueries({ queryKey: keys.profile(userId), type: 'inactive' });
       void qc.invalidateQueries({ queryKey: keys.feedAll });
       void qc.invalidateQueries({ queryKey: keys.blocked });
       void qc.invalidateQueries({ queryKey: keys.favorites });
@@ -235,12 +235,13 @@ export function useReport() {
   return useMutation({ mutationFn: (input: ReportInput) => backend.report(input) });
 }
 
-export function invalidateNetwork(qc: QueryClient) {
+/** Refreshes everything that depends on links and requests. A blocked profile is dropped, not refetched (it is no longer readable). */
+export function invalidateNetwork(qc: QueryClient, blockedId?: string) {
   void qc.invalidateQueries({ queryKey: keys.requestsAll });
   void qc.invalidateQueries({ queryKey: keys.connections });
   void qc.invalidateQueries({ queryKey: keys.collaborations });
   void qc.invalidateQueries({ queryKey: keys.conversations });
-  void qc.invalidateQueries({ queryKey: ['profile'] });
+  void qc.invalidateQueries({ queryKey: ['profile'], predicate: (q) => q.queryKey[1] !== blockedId });
 }
 
 /**

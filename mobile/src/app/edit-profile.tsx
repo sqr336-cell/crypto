@@ -152,7 +152,7 @@ function Editor({ profile, initialLinks }: { profile: Profile; initialLinks: str
 
         <Block title={t('editProfile.elsewhere')}>
           <View style={styles.links}>
-            <Text variant="caption" tone="dim">
+            <Text variant="caption" tone="mist">
               {t('editProfile.elsewhereHint')}
             </Text>
             {urls.map((u, i) => {

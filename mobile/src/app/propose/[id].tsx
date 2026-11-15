@@ -81,7 +81,7 @@ export default function Propose() {
               ))}
             </ChipGroup>
           ) : (
-            <Text variant="caption" tone="dim">
+            <Text variant="caption" tone="mist">
               {t('request.noTracks')}
             </Text>
           )}

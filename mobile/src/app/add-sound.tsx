@@ -91,7 +91,7 @@ export default function AddSound() {
           analysis?.waveform ? (
             <Waveform peaks={analysis.waveform} progress={0} height={44} />
           ) : (
-            <Text variant="caption" tone="dim">
+            <Text variant="caption" tone="mist">
               {t('addTrack.noWaveform')}
             </Text>
           )
@@ -109,7 +109,15 @@ export default function AddSound() {
           </View>
         </View>
         <View>
-          <SectionTitle>{`${t('addTrack.key')}  ${t('common.optional').toLowerCase()}`}</SectionTitle>
+          <SectionTitle
+            action={
+              <Text variant="caption" tone="mist">
+                {t('common.optional')}
+              </Text>
+            }
+          >
+            {t('addTrack.key')}
+          </SectionTitle>
           <ChipGroup>
             {MUSICAL_KEYS.map((k) => (
               <Chip key={k} label={k} selected={key === k} onPress={() => setKey(key === k ? null : k)} />
@@ -126,7 +134,7 @@ export default function AddSound() {
             </ChipGroup>
           </View>
         ) : null}
-        <Text variant="caption" tone="dim">
+        <Text variant="caption" tone="mist">
           {t('addTrack.rights')}
         </Text>
         {error ? (
